@@ -308,7 +308,34 @@ public class Vigenere
 
 		JButton btnDekripto = new JButton("");
 		btnDekripto.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		
+		btnDekripto.addActionListener(new ActionListener()
+		{
+			// clickDekripto
+			public void actionPerformed(ActionEvent arg0)
+			{
+				// nese nuk ka as ciphertext as celes te shenuar
+				if (txtCelesi.getText().isEmpty() && txtCiphertexti.getText().isEmpty())
+				{
+					JOptionPane.showMessageDialog(null, "Ju lutem shenoni ciphertextin");
+					return;
+				}
+				// nese nuk ka celes per dekriptim lajmerojme userin
+				else if (txtCelesi.getText().isEmpty())
+				{
+					JOptionPane.showMessageDialog(null, "Ju lutem shenoni celesin per dekriptim");
+					return;
+				}
+				int opsioni;
+				if (rdbtnEnglish.isSelected())
+					opsioni = 1;
+				else if (rdbtnShqip.isSelected())
+					opsioni = 2;
+				else
+					opsioni = 3;
+				String tekstiDekriptuar = Dekripto(txtCiphertexti.getText(), txtCelesi.getText(), opsioni);
+				txtTekstiDekriptuar.setText(tekstiDekriptuar);
+			}
+		});
 		btnDekripto.setIcon(new ImageIcon(Vigenere.class.getResource("/images_files/ico_2.png")));
 		btnDekripto.setOpaque(false);
 		btnDekripto.setContentAreaFilled(false);
