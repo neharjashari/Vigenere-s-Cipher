@@ -345,7 +345,67 @@ public class Vigenere
 		frmVigenereCipher.getContentPane().add(btnDekripto);
 
 		txtCelesi = new JTextField();
-		
+		txtCelesi.addKeyListener(new KeyAdapter()
+		{
+			// KEYPRESS tek celesi
+			@Override
+			public void keyPressed(KeyEvent arg0)
+			{
+				// nese ben paste ne textfield
+				if ((arg0.getKeyCode() == KeyEvent.VK_V) && ((arg0.getModifiers() & KeyEvent.CTRL_MASK) != 0))
+				{
+					String data = "";
+					// tentojme te marrim si string ate se cfare permban clipboard
+					try
+					{
+						data = (String) Toolkit.getDefaultToolkit().getSystemClipboard()
+								.getData(DataFlavor.stringFlavor);
+					} 
+					catch (HeadlessException | UnsupportedFlavorException | IOException e)
+					{
+						System.out.println(e.getMessage());
+					}
+					data = data.toUpperCase();
+					// ndryshojme permbajtjen e clipboard-it
+					StringSelection selection = new StringSelection(data);
+					Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+					// paste kur eshte shqip ose jo
+					// me regex i themi qe fillon me cka ka brenda [], perseritet 0 ose me shume
+					// here
+					// dhe posahtu mbaron me ate se cfare ka brenda []
+					if ((!data.matches("^[A-Z]*$") && !rdbtnShqip.isSelected())
+							|| (!data.matches("^[ABCDEFGHIJKLMNOPQRSTUVXYZËÇëç]*$") && rdbtnShqip.isSelected()))
+					{
+						arg0.consume();
+					}
+				}
+			}
+			// KEYTYPE tek celesi
+			@Override
+			public void keyTyped(KeyEvent arg0)
+			{
+				char keyChar = arg0.getKeyChar();
+				if ((arg0.getKeyChar() == 'w' || arg0.getKeyChar() == 'W') && (rdbtnShqip.isSelected()))
+				{
+					arg0.consume();
+					Toolkit.getDefaultToolkit().beep();
+				}
+				// nese eshte shkronje e kthen ne uppercase
+				if (Character.isAlphabetic(keyChar))
+				{
+					if (Character.isLowerCase(keyChar))
+					{
+						arg0.setKeyChar(Character.toUpperCase(keyChar));
+					}
+				}
+				// nese nuk eshte shkronje nuk lihet te shenohet fare
+				else
+				{
+					arg0.consume();
+					Toolkit.getDefaultToolkit().beep();
+				}
+			}
+		});
 
 			
 		txtCelesi.addFocusListener(new FocusAdapter()
