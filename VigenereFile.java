@@ -386,7 +386,67 @@ public class VigenereFile
 		frmVigenereCipher.getContentPane().add(btnDekripto);
 
 		txtCelesi = new JTextField();
-		
+		txtCelesi.addKeyListener(new KeyAdapter()
+		{
+			// KEYPRESS tek celesi
+			@Override
+			public void keyPressed(KeyEvent arg0)
+			{
+				// nese ben paste ne textfield
+				if ((arg0.getKeyCode() == KeyEvent.VK_V) && ((arg0.getModifiers() & KeyEvent.CTRL_MASK) != 0))
+				{
+					String data = "";
+					// tentojme te marrim si string ate se cfare permban clipboard
+					try
+					{
+						data = (String) Toolkit.getDefaultToolkit().getSystemClipboard()
+								.getData(DataFlavor.stringFlavor);
+					} catch (HeadlessException | UnsupportedFlavorException | IOException e)
+					{
+						System.out.println(e.getMessage());
+					}
+					data = data.toUpperCase();
+					// ndryshojme permbajtjen e clipboard-it
+					StringSelection selection = new StringSelection(data);
+					Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+					// paste kur eshte shqip ose jo
+					// me regex i themi qe fillon me cka ka brenda [], perseritet 0 ose me shume
+					// here
+					// dhe posahtu mbaron me ate se cfare ka brenda []
+					if ((!data.matches("^[A-Z]*$") && !rdbtnShqip.isSelected())
+							|| (!data.matches("^[ABCDEFGHIJKLMNOPQRSTUVXYZ����]*$") && rdbtnShqip.isSelected()))
+					{
+						arg0.consume();
+					}
+				}
+			}
+
+			// KEYTYPE tek celesi
+			@Override
+			public void keyTyped(KeyEvent arg0)
+			{
+				char keyChar = arg0.getKeyChar();
+				if ((arg0.getKeyChar() == 'w' || arg0.getKeyChar() == 'W') && (rdbtnShqip.isSelected()))
+				{
+					arg0.consume();
+				}
+				// nese eshte shkronje e kthen ne uppercase
+				if (Character.isAlphabetic(keyChar))
+				{
+					if (Character.isLowerCase(keyChar))
+					{
+						arg0.setKeyChar(Character.toUpperCase(keyChar));
+					}
+				}
+				// nese nuk eshte shkronje nuk lihet te shenohet fare
+				else
+				{
+					arg0.consume();
+					Toolkit.getDefaultToolkit().beep();
+				}
+			}
+		});
+
 		txtCelesi.setFont(new Font("Trebuchet MS", Font.PLAIN, 26));
 		txtCelesi.setColumns(10);
 		txtCelesi.setBounds(1308, 75, 204, 43);
@@ -409,7 +469,32 @@ public class VigenereFile
 		btnImport.setSelectedIcon(null);
 		btnImport.setBackground(new Color(255, 255, 255));
 		btnImport.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		
+		btnImport.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent arg0)
+			{
+				// lexojme kontekstin e files me ane te skanerit
+				file.showOpenDialog(null);
+				Scanner sc = null;
+				try
+				{
+					sc = new Scanner(file.getSelectedFile());
+				} 
+				catch (FileNotFoundException | NullPointerException e)
+				{
+					return;
+				}
+				String teksti = "";
+				while (sc.hasNextLine())
+				{
+					teksti += sc.nextLine();
+				}
+				if (rdbtnPlaintextImport.isSelected())
+					txtPlaintexti.setText(teksti);
+				else
+					txtCiphertexti.setText(teksti);
+			}
+		});
 		btnImport.setFont(new Font("Trebuchet MS", Font.PLAIN, 26));
 		btnImport.setBounds(190, 606, 72, 61);
 		frmVigenereCipher.getContentPane().add(btnImport);
@@ -420,7 +505,47 @@ public class VigenereFile
 		btnExport.setContentAreaFilled(false);
 		btnExport.setBackground(new Color(255, 255, 255));
 		btnExport.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		
+		btnExport.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String teksti = "";
+				file.showSaveDialog(null);
+
+				if (rdbtnCiphertextExport.isSelected())
+					teksti = txtCiphertexti.getText();
+				else
+					teksti = txtTekstiDekriptuar.getText();
+
+				BufferedWriter bw = null;
+				FileWriter fw = null;
+				try
+				{
+					// shkruajme ne filen qe eshte selektuar
+					fw = new FileWriter(file.getSelectedFile());
+					bw = new BufferedWriter(fw);
+					bw.write(teksti);
+				} 
+				catch (IOException | NullPointerException ex)
+				{
+					return;
+				} 
+				finally
+				{
+					try
+					{
+						if (bw != null)
+							bw.close();
+						if (fw != null)
+							fw.close();
+					} 
+					catch (IOException ex)
+					{
+						return;
+					}
+				}
+			}
+		});
 		btnExport.setFont(new Font("Trebuchet MS", Font.PLAIN, 26));
 		btnExport.setBounds(597, 606, 72, 61);
 		frmVigenereCipher.getContentPane().add(btnExport);
