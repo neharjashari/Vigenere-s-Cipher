@@ -365,6 +365,118 @@ public class Vigenere
 		frmVigenereCipher.getContentPane().add(label_2);
 
 	}
+	
+	int pozitaNeVargChar(char karakteri, char[] vargu)
+	{
+		int pozita = -1;
+		for (int i = 0; i < vargu.length; i++)
+		{
+			if (karakteri == vargu[i])
+			{
+				pozita = i;
+				break;
+			}
+		}
+		return pozita;
+	}
+
+	// ---------------------------------------------------------------------------------
+	// ---------------------------------METODA ENKRIPTO---------------------------------
+	// ---------------------------------------------------------------------------------
+	String Enkripto(String plaintexti, String celesi, int opsioni)
+	{
+		StringBuilder rez = new StringBuilder(plaintexti);
+		// Anglisht
+		if (opsioni == 1)
+		{
+			// ne rast se eshte nderruar butoni pas gjenerimit ose pas shenimit
+			celesi = celesi.replace('Ë', 'E');
+			celesi = celesi.replace('Ç', 'C');
+			txtCelesi.setText(celesi);
+			int ii = 0;
+			for (int i = 0; i < rez.length(); i++)
+			{
+				if (plaintexti.charAt(i) >= 'a' && plaintexti.charAt(i) <= 'z')
+				{
+					int pozita = plaintexti.charAt(i) - 'a';
+					int pozitaRe = (pozita + (celesi.charAt(ii % celesi.length()) - 'A')) % 26;
+					char encCharacter = (char) (pozitaRe + 'a');
+					rez.setCharAt(i, encCharacter);
+					ii++;
+				} 
+				else if (plaintexti.charAt(i) >= 'A' && plaintexti.charAt(i) <= 'Z')
+				{
+					int pozita = plaintexti.charAt(i) - 'A';
+					int pozitaRe = (pozita + (celesi.charAt(ii % celesi.length()) - 'A')) % 26;
+					char encCharacter = (char) (pozitaRe + 'A');
+					rez.setCharAt(i, encCharacter);
+					ii++;
+				} 
+				else
+				{
+					continue;
+				}
+			}
+		}
+		// Shqip
+		else if (opsioni == 2)
+		{
+			celesi = celesi.replace('W', 'V');
+			txtCelesi.setText(celesi);
+			int ii = 0;
+			for (int i = 0; i < rez.length(); i++)
+			{
+				if (((plaintexti.charAt(i) >= 'a' && plaintexti.charAt(i) <= 'z') || plaintexti.charAt(i) == 'ë'
+						|| plaintexti.charAt(i) == 'ç') && (plaintexti.charAt(i) != 'w'))
+				{
+					int pozita;
+					int pozitaCel;
+					// gjejme poziten e shkronjes se plaintext ne vargun alfabetiLow
+					// dhe poziten e shkronjes se celesit ne vargun alfabeti
+					pozita = pozitaNeVargChar(plaintexti.charAt(i), alfabetiLow);
+					pozitaCel = pozitaNeVargChar(celesi.charAt(ii % celesi.length()), alfabeti);
+					int pozitaRe = (pozita + pozitaCel) % alfabetiLow.length;
+					char encCharacter = alfabetiLow[pozitaRe];
+					rez.setCharAt(i, encCharacter);
+					ii++;
+				} 
+				else if (((plaintexti.charAt(i) >= 'A' && plaintexti.charAt(i) <= 'Z') || plaintexti.charAt(i) == 'Ë'
+						|| plaintexti.charAt(i) == 'Ç') && (plaintexti.charAt(i) != 'W'))
+				{
+					int pozita;
+					int pozitaCel;
+					// gjejme poziten e shkronjes se plaintext ne vargun alfabetiLow
+					// dhe poziten e shkronjes se celesit ne vargun alfabeti
+					pozita = pozitaNeVargChar(plaintexti.charAt(i), alfabeti);
+					pozitaCel = pozitaNeVargChar(celesi.charAt(ii % celesi.length()), alfabeti);
+					int pozitaRe = (pozita + pozitaCel) % alfabeti.length;
+					char encCharacter = alfabeti[pozitaRe];
+					rez.setCharAt(i, encCharacter);
+					ii++;
+				} 
+				else
+				{
+					continue;
+				}
+			}
+		}
+		// Te gjitha karakteret
+		else
+		{
+			celesi = celesi.replace('Ë', 'E');
+			celesi = celesi.replace('Ç', 'C');
+			txtCelesi.setText(celesi);
+			for (int i = 0; i < rez.length(); i++)
+			{
+				int pozita = plaintexti.charAt(i);
+				int pozitaRe = ((pozita + (celesi.charAt(i % celesi.length()) - 'A'))) % 256;
+				char encCharacter = (char) (pozitaRe);
+				rez.setCharAt(i, encCharacter);
+			}
+		}
+		return rez.toString();
+	}
+
 
 	
 }
