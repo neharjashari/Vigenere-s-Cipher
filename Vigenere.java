@@ -204,7 +204,55 @@ public class Vigenere
 		btnGjenero.setIcon(new ImageIcon(Vigenere.class.getResource("/images_files/Webp.net-resizeimage (4).png")));
 		btnGjenero.setContentAreaFilled(false);
 		btnGjenero.setBorderPainted(false);
-
+		btnGjenero.addActionListener(new ActionListener()
+		{
+			// clickGjenero
+			public void actionPerformed(ActionEvent arg0)
+			{
+				// gjenerimi i gjatesise se celesit
+				Random rand = new Random();
+				int randomNr = 3;
+				while (true)
+				{
+					randomNr = rand.nextInt(1025);
+					if (randomNr <= 1024 && randomNr >= 5)
+						break;
+				}
+				StringBuilder celesiA = new StringBuilder();
+				// Gjenerojme celesin kur nuk eshte selektuar butoni per gjuhen shqipe
+				if (!rdbtnShqip.isSelected())
+				{
+					for (int i = 0; i < randomNr; i++)
+					{
+						celesiA.append((char) (rand.nextInt(26) + 'A'));
+					}
+				}
+				// Gjenerojme celesin per implementimin e gjuhes shqipe
+				else
+				{
+					for (int i = 0; i < randomNr; i++)
+					{
+						if(rand.nextInt(28) % 27 == 0)
+						{
+							if (rand.nextInt(10) % 2 == 0)
+								celesiA.append('Ç');
+							else
+								celesiA.append('Ë');
+						} 
+						else
+						{
+							celesiA.append((char) (rand.nextInt(26) + 'A'));
+							if (celesiA.charAt(celesiA.length() - 1) == 'W')
+							{
+								i--;
+								celesiA.deleteCharAt(celesiA.length() - 1);
+							}
+						}
+					}
+				}
+				txtCelesi.setText(celesiA.toString());
+			}
+		});
 		btnGjenero.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnGjenero.setBackground(Color.WHITE);
 		
@@ -222,6 +270,41 @@ public class Vigenere
 		btnEnkripto.setFont(new Font("Trebuchet MS", Font.PLAIN, 26));
 		btnEnkripto.setBounds(53, 368, 69, 96);
 		frmVigenereCipher.getContentPane().add(btnEnkripto);
+		btnEnkripto.addActionListener(new ActionListener()
+		{
+			// clickEnkripto
+			public void actionPerformed(ActionEvent arg0)
+			{
+				// nese nuk ka as celes as plaintext
+				if (txtCelesi.getText().isEmpty() && txtPlaintexti.getText().isEmpty())
+				{
+					JOptionPane.showMessageDialog(null, "Ju lutem shenoni plaintextin");
+					return;
+				}
+				// gjenerojme nje celes te rendomte nese shfrytezuesi nuk ka dhene nje te tille
+				else if (txtCelesi.getText().isEmpty())
+					btnGjenero.doClick();
+
+				// gjatesia minimale e celesit 5, maksimale 1024
+				if (txtCelesi.getText().length() < 5 || txtCelesi.getText().length() > 1024)
+				{
+					JOptionPane.showMessageDialog(null,
+							"Ju lutem jepeni nje celes valid (5 <= Gjatesia e celesit <= 1024)!");
+					return;
+				}
+
+				// varesisht njera nga modet e zgjedhura
+				int opsioni;
+				if (rdbtnEnglish.isSelected())
+					opsioni = 1;
+				else if (rdbtnShqip.isSelected())
+					opsioni = 2;
+				else
+					opsioni = 3;
+				String cipherteksti = Enkripto(txtPlaintexti.getText(), txtCelesi.getText(), opsioni);
+				txtCiphertexti.setText(cipherteksti);
+			}
+		});
 
 		JButton btnDekripto = new JButton("");
 		btnDekripto.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
